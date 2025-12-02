@@ -2,7 +2,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { UserRole, GoldPrice, Transaction, AuthState, TransactionType, PaymentMethod, PaymentMethodInfo, TransactionStatus } from './types';
 import { mockBackend } from './services/mockBackend';
-import { getMarketInsight } from './services/geminiService';
 import { Button } from './components/ui/Button';
 import { Input } from './components/ui/Input';
 
@@ -15,7 +14,6 @@ interface DataContextType {
   refreshTransactions: () => Promise<void>;
   paymentMethods: PaymentMethodInfo[];
   refreshPaymentMethods: () => Promise<void>;
-  marketInsight: string;
 }
 
 const AuthContext = createContext<{
@@ -143,7 +141,7 @@ const LoginView = () => {
 
 const UserDashboard = () => {
   const { auth } = useContext(AuthContext)!;
-  const { goldPrice, marketInsight } = useContext(DataContext)!;
+  const { goldPrice } = useContext(DataContext)!;
 
   const portfolioValue = (auth.user?.walletBalanceGold || 0) * (goldPrice?.pricePerGram || 0);
 
@@ -203,17 +201,6 @@ const UserDashboard = () => {
              <p className="text-sm text-gold-400 font-medium">৳ {goldPrice?.pricePerGram}/g</p>
           </div>
         </div>
-      </div>
-
-      {/* Market Insight AI */}
-      <div className="bg-dark-800 rounded-xl p-4 border border-gray-800">
-        <div className="flex items-center gap-2 mb-3">
-          <i className="fas fa-robot text-gold-500"></i>
-          <h3 className="font-semibold text-white text-sm">AI Market Insight</h3>
-        </div>
-        <p className="text-sm text-gray-400 leading-relaxed italic">
-          "{marketInsight || 'Analyzing market trends...'}"
-        </p>
       </div>
 
       {/* Quick Actions */}
@@ -1007,7 +994,6 @@ export default function App() {
   const [goldPrice, setGoldPrice] = useState<GoldPrice | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethodInfo[]>([]);
-  const [marketInsight, setMarketInsight] = useState<string>('');
 
   // --- Auth Actions ---
   const refreshUser = async () => {
@@ -1052,9 +1038,6 @@ export default function App() {
   const refreshPrice = async () => {
     const price = await mockBackend.getGoldPrice();
     setGoldPrice(price);
-    // Fetch AI Insight when price updates
-    const insight = await getMarketInsight(price.pricePerGram);
-    setMarketInsight(insight);
   };
 
   const refreshPaymentMethods = async () => {
@@ -1090,7 +1073,7 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={{ auth, login, register, updateProfile, logout, refreshUser }}>
-      <DataContext.Provider value={{ goldPrice, refreshPrice, transactions, refreshTransactions, marketInsight, paymentMethods, refreshPaymentMethods }}>
+      <DataContext.Provider value={{ goldPrice, refreshPrice, transactions, refreshTransactions, paymentMethods, refreshPaymentMethods }}>
         <AppContent />
       </DataContext.Provider>
     </AuthContext.Provider>
