@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import { User, UserRole, GoldPrice, Transaction, ApiResponse, AuthState, TransactionType, PaymentMethod, PaymentMethodInfo, TransactionStatus } from './types';
+import { UserRole, GoldPrice, Transaction, AuthState, TransactionType, PaymentMethod, PaymentMethodInfo, TransactionStatus } from './types';
 import { mockBackend } from './services/mockBackend';
 import { getMarketInsight } from './services/geminiService';
 import { Button } from './components/ui/Button';
@@ -247,7 +247,7 @@ const UserDashboard = () => {
 
 const BuyGoldView = () => {
   const { goldPrice, refreshTransactions, paymentMethods } = useContext(DataContext)!;
-  const { refreshUser, auth } = useContext(AuthContext)!;
+  const { auth } = useContext(AuthContext)!;
   
   const [amount, setAmount] = useState<number | ''>('');
   const [method, setMethod] = useState<PaymentMethod>(PaymentMethod.BKASH);
@@ -938,7 +938,6 @@ const AdminDashboard = () => {
 
 const AppContent = () => {
   const { auth } = useContext(AuthContext)!;
-  const { transactions } = useContext(DataContext)!;
   const [currentView, setCurrentView] = useState('home');
 
   useEffect(() => {
